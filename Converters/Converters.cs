@@ -1,4 +1,5 @@
 using System.Globalization;
+using SecureBird_Data_Store.Models;
 
 namespace SecureBird_Data_Store.Converters;
 
@@ -38,6 +39,29 @@ public class NullToStringConverter : IValueConverter
         var parts = (parameter as string ?? "null|not null").Split('|');
         return value is null ? (parts.Length > 0 ? parts[0] : string.Empty)
                              : (parts.Length > 1 ? parts[1] : string.Empty);
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+public class IsNotZeroConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is int i && i != 0;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+// Shows the first non-empty field value of a DataRecord in a Picker
+public class RecordDisplayConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not DataRecord record) return string.Empty;
+        var first = record.Fields.FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.Value));
+        return first.Value ?? $"#{record.Id[..6]}";
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

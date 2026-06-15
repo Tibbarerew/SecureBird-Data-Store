@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SecureBird_Data_Store.Models;
@@ -15,28 +16,22 @@ public partial class ImportExcelViewModel : BaseViewModel
     private string _filePath = string.Empty;
 
     [ObservableProperty]
-    private ExcelImportResult? _importResult;
+    private string _fileName = string.Empty;
 
     [ObservableProperty]
-    private ExcelSheetPreview? _selectedSheet;
+    private ObservableCollection<SheetImportConfig> _sheetConfigs = [];
 
     [ObservableProperty]
     private ObservableCollection<DataStructure> _existingStructures = [];
 
     [ObservableProperty]
-    private DataStructure? _targetStructure;
-
-    [ObservableProperty]
-    private string _newStructureName = string.Empty;
-
-    [ObservableProperty]
-    private bool _createNewStructure = true;
-
-    [ObservableProperty]
     private bool _importComplete;
 
     [ObservableProperty]
-    private int _importedCount;
+    private int _importedRecords;
+
+    [ObservableProperty]
+    private int _importedStructures;
 
     public ImportExcelViewModel(IExcelImportService excelService, IJsonDataService dataService)
     {
@@ -60,72 +55,125 @@ public partial class ImportExcelViewModel : BaseViewModel
         if (result is null) return;
 
         FilePath = result.FullPath;
+        FileName = result.FileName;
+
         await RunAsync(async () =>
         {
-            ImportResult = await _excelService.ReadExcelAsync(FilePath);
-            if (ImportResult.Success && ImportResult.Sheets.Count > 0)
+            var importResult = await _excelService.ReadExcelAsync(FilePath);
+            if (!importResult.Success)
             {
-                SelectedSheet = ImportResult.Sheets[0];
-                NewStructureName = Path.GetFileNameWithoutExtension(FilePath);
+                StatusMessage = $"Could not read file: {importResult.ErrorMessage}";
+                return;
             }
-        }, "Reading Excel file...");
 
-        var structures = await _dataService.GetStructuresAsync();
-        ExistingStructures = new ObservableCollection<DataStructure>(structures);
+            var structures = await _dataService.GetStructuresAsync();
+            ExistingStructures = new ObservableCollection<DataStructure>(structures);
+
+            // Build a config for each sheet
+            var configs = new ObservableCollection<SheetImportConfig>();
+            foreach (var sheet in importResult.Sheets)
+            {
+                var config = new SheetImportConfig
+                {
+                    Sheet = sheet,
+                    StructureName = sheet.SheetName,
+                    CreateNew = true,
+                    Include = true
+                };
+                config.PropertyChanged += OnConfigPropertyChanged;
+                configs.Add(config);
+            }
+            SheetConfigs = configs;
+        }, "Reading Excel file...");
+    }
+
+    private async void OnConfigPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not SheetImportConfig config) return;
+
+        if (e.PropertyName == nameof(SheetImportConfig.ParentStructure))
+        {
+            if (config.ParentStructure is null)
+            {
+                config.SetAvailableParentRecords([], null);
+                return;
+            }
+            var records = await _dataService.GetRecordsAsync(config.ParentStructure.Id);
+            config.SetAvailableParentRecords(records, config.ParentStructure);
+        }
     }
 
     [RelayCommand]
     public async Task ImportAsync()
     {
-        if (SelectedSheet is null || string.IsNullOrWhiteSpace(FilePath))
+        var included = SheetConfigs.Where(c => c.Include).ToList();
+        if (included.Count == 0)
         {
-            StatusMessage = "Please select a file and sheet.";
+            StatusMessage = "No sheets selected for import.";
             return;
         }
 
         await RunAsync(async () =>
         {
-            DataStructure structure;
+            int totalRecords = 0;
+            int totalStructures = 0;
 
-            if (CreateNewStructure)
+            foreach (var config in included)
             {
-                var name = string.IsNullOrWhiteSpace(NewStructureName)
-                    ? SelectedSheet.SheetName
-                    : NewStructureName;
-                structure = _excelService.SuggestStructure(SelectedSheet, name);
-                await _dataService.SaveStructureAsync(structure);
-            }
-            else
-            {
-                if (TargetStructure is null)
+                DataStructure structure;
+
+                if (config.CreateNew)
                 {
-                    StatusMessage = "Please select an existing structure.";
-                    return;
+                    var name = string.IsNullOrWhiteSpace(config.StructureName)
+                        ? config.SheetName
+                        : config.StructureName;
+                    structure = _excelService.SuggestStructure(config.Sheet, name);
+
+                    if (config.HasParent && config.SelectedParentRecord is not null)
+                        structure.ParentStructureId = config.SelectedParentRecord.StructureId;
+
+                    await _dataService.SaveStructureAsync(structure);
+                    totalStructures++;
                 }
-                structure = TargetStructure;
+                else
+                {
+                    if (config.ExistingStructure is null) continue;
+                    structure = config.ExistingStructure;
+                }
+
+                var parentRecordId = config.HasParent
+                    ? config.SelectedParentRecord?.Id
+                    : null;
+
+                var records = await _excelService.ImportSheetAsRecordsAsync(
+                    FilePath, config.SheetName, structure.Id, config.Sheet.Headers);
+
+                foreach (var record in records)
+                {
+                    record.ParentRecordId = parentRecordId;
+                    await _dataService.SaveRecordAsync(record);
+                    totalRecords++;
+                }
             }
 
-            var records = await _excelService.ImportSheetAsRecordsAsync(
-                FilePath, SelectedSheet.SheetName, structure.Id, SelectedSheet.Headers);
-
-            foreach (var record in records)
-                await _dataService.SaveRecordAsync(record);
-
-            ImportedCount = records.Count;
+            ImportedRecords = totalRecords;
+            ImportedStructures = totalStructures;
             ImportComplete = true;
-        }, "Importing data...");
+        }, "Importing...");
     }
 
     [RelayCommand]
     public void Reset()
     {
+        foreach (var config in SheetConfigs)
+            config.PropertyChanged -= OnConfigPropertyChanged;
+
         FilePath = string.Empty;
-        ImportResult = null;
-        SelectedSheet = null;
+        FileName = string.Empty;
+        SheetConfigs = [];
         ImportComplete = false;
-        ImportedCount = 0;
+        ImportedRecords = 0;
+        ImportedStructures = 0;
         StatusMessage = string.Empty;
-        NewStructureName = string.Empty;
-        CreateNewStructure = true;
     }
 }

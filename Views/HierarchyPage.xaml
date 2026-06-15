@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SecureBird_Data_Store.ViewModels"
+             x:Class="SecureBird_Data_Store.Views.HierarchyPage"
+             x:DataType="vm:HierarchyViewModel"
+             Title="Data Hierarchy">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="16,12" BackgroundColor="{StaticResource Tertiary}">
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="Data Hierarchy" FontSize="20" FontAttributes="Bold"
+                       TextColor="White" VerticalOptions="Center"/>
+                <ActivityIndicator IsRunning="{Binding IsBusy}" Color="White"
+                                   VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- Stats bar -->
+        <HorizontalStackLayout Grid.Row="1" Padding="16,8" Spacing="20"
+                               BackgroundColor="{StaticResource Secondary}">
+            <Label Text="{Binding TotalStructures, StringFormat='{0} structures'}"
+                   FontSize="13" TextColor="{StaticResource Tertiary}" FontAttributes="Bold"/>
+            <Label Text="|" TextColor="{StaticResource Gray400}" FontSize="13"/>
+            <Label Text="{Binding TotalRecords, StringFormat='{0} total records'}"
+                   FontSize="13" TextColor="{StaticResource Gray600}"/>
+            <Label Text="|" TextColor="{StaticResource Gray400}" FontSize="13"/>
+            <Label Text="Tap ▶ to expand" FontSize="12" TextColor="{StaticResource Gray400}"
+                   FontAttributes="Italic"/>
+        </HorizontalStackLayout>
+
+        <!-- Tree -->
+        <CollectionView Grid.Row="2" ItemsSource="{Binding VisibleNodes}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12" Padding="32">
+                    <Label Text="No data yet." FontSize="16" TextColor="{StaticResource Gray500}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Import an Excel file or create structures and records to see them here."
+                           FontSize="13" TextColor="{StaticResource Gray400}"
+                           HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:HierarchyNodeViewModel">
+                    <Grid>
+                        <Border Margin="0,1" Padding="{Binding IndentMargin}"
+                                BackgroundColor="White" StrokeThickness="0">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HierarchyViewModel}}, Path=ToggleNodeCommand}"
+                                    CommandParameter="{Binding .}"/>
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="24,Auto,*" ColumnSpacing="8"
+                                  Padding="0,10">
+
+                                <!-- Expand icon -->
+                                <Label Grid.Column="0" Text="{Binding ExpandIcon}"
+                                       FontSize="12" TextColor="{StaticResource Gray500}"
+                                       VerticalOptions="Center" HorizontalOptions="Center"/>
+
+                                <!-- Structure badge -->
+                                <Border Grid.Column="1" Padding="6,2"
+                                        StrokeShape="RoundRectangle 4"
+                                        BackgroundColor="{Binding StructureColor}"
+                                        Stroke="Transparent">
+                                    <Label Text="{Binding StructureName}"
+                                           FontSize="10" TextColor="White"
+                                           FontAttributes="Bold"/>
+                                </Border>
+
+                                <!-- Record label -->
+                                <Label Grid.Column="2" Text="{Binding DisplayLabel}"
+                                       FontSize="14" VerticalOptions="Center"
+                                       LineBreakMode="TailTruncation"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Separator -->
+                        <BoxView HeightRequest="1" Color="{StaticResource Gray100}"
+                                 VerticalOptions="End"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

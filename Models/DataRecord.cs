@@ -6,5 +6,6 @@ public class DataRecord
     public string StructureId { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public string? ParentRecordId { get; set; }
     public Dictionary<string, string?> Fields { get; set; } = [];
 }

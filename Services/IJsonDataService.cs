@@ -10,6 +10,8 @@ public interface IJsonDataService
     Task DeleteStructureAsync(string id);
 
     Task<List<DataRecord>> GetRecordsAsync(string structureId);
+    Task<List<DataRecord>> GetAllRecordsAsync();
+    Task<List<DataRecord>> GetChildRecordsAsync(string parentRecordId);
     Task<DataRecord?> GetRecordAsync(string structureId, string recordId);
     Task SaveRecordAsync(DataRecord record);
     Task DeleteRecordAsync(string structureId, string recordId);

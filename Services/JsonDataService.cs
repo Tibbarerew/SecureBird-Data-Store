@@ -87,6 +87,34 @@ public class JsonDataService : IJsonDataService
         return results.OrderByDescending(r => r.CreatedAt).ToList();
     }
 
+    public async Task<List<DataRecord>> GetAllRecordsAsync()
+    {
+        var recordsRoot = Path.Combine(_dataRoot, "records");
+        if (!Directory.Exists(recordsRoot)) return [];
+
+        var results = new List<DataRecord>();
+        foreach (var structureDir in Directory.GetDirectories(recordsRoot))
+        {
+            foreach (var file in Directory.GetFiles(structureDir, "*.json"))
+            {
+                try
+                {
+                    var json = await File.ReadAllTextAsync(file);
+                    var r = JsonSerializer.Deserialize<DataRecord>(json, _jsonOptions);
+                    if (r is not null) results.Add(r);
+                }
+                catch { /* skip malformed files */ }
+            }
+        }
+        return results;
+    }
+
+    public async Task<List<DataRecord>> GetChildRecordsAsync(string parentRecordId)
+    {
+        var all = await GetAllRecordsAsync();
+        return all.Where(r => r.ParentRecordId == parentRecordId).ToList();
+    }
+
     public async Task<DataRecord?> GetRecordAsync(string structureId, string recordId)
     {
         var path = RecordPath(structureId, recordId);

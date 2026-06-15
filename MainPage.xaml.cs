@@ -18,4 +18,9 @@ public partial class MainPage : ContentPage
     {
         await Shell.Current.GoToAsync(nameof(ImportExcelPage));
     }
+
+    private async void OnHierarchyClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(HierarchyPage));
+    }
 }

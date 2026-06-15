@@ -26,12 +26,14 @@ public static class MauiProgram
         builder.Services.AddTransient<DataStructuresViewModel>();
         builder.Services.AddTransient<DataRecordsViewModel>();
         builder.Services.AddTransient<ImportExcelViewModel>();
+        builder.Services.AddTransient<HierarchyViewModel>();
 
         // Pages
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<DataStructuresPage>();
         builder.Services.AddTransient<DataRecordsPage>();
         builder.Services.AddTransient<ImportExcelPage>();
+        builder.Services.AddTransient<HierarchyPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

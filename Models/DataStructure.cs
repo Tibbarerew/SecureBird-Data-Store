@@ -7,5 +7,6 @@ public class DataStructure
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public string? ParentStructureId { get; set; }
     public List<FieldDefinition> Fields { get; set; } = [];
 }
