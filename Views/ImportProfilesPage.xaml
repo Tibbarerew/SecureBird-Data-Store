@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SecureBird_Data_Store.ViewModels"
+             xmlns:models="clr-namespace:SecureBird_Data_Store.Models"
+             x:Class="SecureBird_Data_Store.Views.ImportProfilesPage"
+             x:DataType="vm:ImportProfilesViewModel"
+             Title="Import Profiles">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="16,12" BackgroundColor="{StaticResource Tertiary}">
+            <Label Text="Import Profiles" FontSize="20" FontAttributes="Bold" TextColor="White"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+
+            <!-- Profile list -->
+            <CollectionView ItemsSource="{Binding Profiles}"
+                            IsVisible="{Binding SelectedProfile, Converter={StaticResource IsNullConverter}}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12" Padding="32">
+                        <Label Text="No import profiles saved yet." FontSize="16"
+                               TextColor="{StaticResource Gray500}" HorizontalOptions="Center"/>
+                        <Label Text="Go to Import Excel, configure your sheets, then click Save Profile."
+                               FontSize="13" TextColor="{StaticResource Gray400}"
+                               HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:ImportProfile">
+                        <Border Margin="12,6" Padding="16" StrokeShape="RoundRectangle 8"
+                                Stroke="{StaticResource Gray200}">
+                            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto,Auto" RowSpacing="4">
+                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}"
+                                       FontSize="15" FontAttributes="Bold"/>
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding Summary}"
+                                       FontSize="12" TextColor="{StaticResource Gray500}"/>
+                                <Label Grid.Row="2" Grid.Column="0"
+                                       Text="{Binding SourceFileName, StringFormat='Source: {0}'}"
+                                       FontSize="11" TextColor="{StaticResource Gray400}"
+                                       IsVisible="{Binding SourceFileName, Converter={StaticResource IsNotNullConverter}}"/>
+                                <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                        Text="Details" FontSize="12"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        TextColor="{StaticResource Tertiary}"
+                                        CornerRadius="4" Padding="10,4" Margin="4,0"
+                                        CommandParameter="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ImportProfilesViewModel}}, Path=SelectProfileCommand}"/>
+                                <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                        Text="Delete" FontSize="12"
+                                        BackgroundColor="#FFEEEE" TextColor="Red"
+                                        CornerRadius="4" Padding="10,4"
+                                        CommandParameter="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ImportProfilesViewModel}}, Path=DeleteCommand}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Profile detail view -->
+            <ScrollView IsVisible="{Binding SelectedProfile, Converter={StaticResource IsNotNullConverter}}">
+                <VerticalStackLayout Padding="16" Spacing="12" x:DataType="vm:ImportProfilesViewModel">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <Button Grid.Column="0" Text="← Back"
+                                Command="{Binding SelectProfileCommand}"
+                                CommandParameter="{x:Null}"
+                                BackgroundColor="{StaticResource Gray200}"
+                                TextColor="{StaticResource Gray600}"
+                                CornerRadius="6" Padding="12,6" FontSize="13"/>
+                        <Label Grid.Column="1" Text="{Binding SelectedProfile.Name}"
+                               FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
+                    </Grid>
+
+                    <Button Text="Rename" Command="{Binding RenameCommand}"
+                            CommandParameter="{Binding SelectedProfile}"
+                            BackgroundColor="{StaticResource Secondary}"
+                            TextColor="{StaticResource Tertiary}"
+                            CornerRadius="6" Padding="12,6" HorizontalOptions="Start" FontSize="13"/>
+
+                    <Label Text="Sheet Entries" FontSize="15" FontAttributes="Bold" Margin="0,8,0,0"/>
+
+                    <CollectionView ItemsSource="{Binding SelectedProfile.Entries}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:SheetProfileEntry">
+                                <Border Margin="0,4" Padding="14" StrokeShape="RoundRectangle 8"
+                                        Stroke="{StaticResource Gray200}">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="8">
+                                            <Border Grid.Column="0" Padding="5,2" StrokeShape="RoundRectangle 4"
+                                                    BackgroundColor="{StaticResource Primary}" Stroke="Transparent">
+                                                <Label Text="{Binding SheetName}" FontSize="11"
+                                                       TextColor="White" FontAttributes="Bold"/>
+                                            </Border>
+                                            <Label Grid.Column="1" Text="included" FontSize="11"
+                                                   TextColor="#217346"
+                                                   IsVisible="{Binding Include}"/>
+                                            <Label Grid.Column="1" Text="skipped" FontSize="11"
+                                                   TextColor="{StaticResource Gray400}"
+                                                   IsVisible="{Binding Include, Converter={StaticResource InvertedBoolConverter}}"/>
+                                        </Grid>
+                                        <Label Text="{Binding StructureName, StringFormat='Structure: {0}'}"
+                                               FontSize="13"/>
+                                        <Label Text="{Binding ParentRecordId, StringFormat='Parent rule: {0}'}"
+                                               FontSize="12" TextColor="{StaticResource Gray500}"
+                                               IsVisible="{Binding ParentRecordId, Converter={StaticResource IsNotNullConverter}}"/>
+                                        <Label Text="No parent rule" FontSize="12"
+                                               TextColor="{StaticResource Gray400}" FontAttributes="Italic"
+                                               IsVisible="{Binding ParentRecordId, Converter={StaticResource IsNullConverter}}"/>
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </Grid>
+    </Grid>
+</ContentPage>

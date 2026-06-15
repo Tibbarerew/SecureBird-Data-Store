@@ -32,6 +32,56 @@
                     </VerticalStackLayout>
                 </Border>
 
+                <!-- Profile section -->
+                <Border Padding="14" StrokeShape="RoundRectangle 8"
+                        Stroke="{StaticResource Secondary}" BackgroundColor="#F8F6FF"
+                        IsVisible="{Binding SheetConfigs.Count, Converter={StaticResource IsNotZeroConverter}}">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                <Label Text="Import Profiles" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource Tertiary}"/>
+                                <Label Text="{Binding LoadedProfile.Name, StringFormat='Loaded: {0}'}"
+                                       FontSize="11" TextColor="{StaticResource Gray500}"
+                                       IsVisible="{Binding LoadedProfile, Converter={StaticResource IsNotNullConverter}}"/>
+                                <Label Text="No profile loaded" FontSize="11" TextColor="{StaticResource Gray400}"
+                                       IsVisible="{Binding LoadedProfile, Converter={StaticResource IsNullConverter}}"/>
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" Text="Save Profile"
+                                    Command="{Binding SaveProfileCommand}"
+                                    BackgroundColor="{StaticResource Secondary}"
+                                    TextColor="{StaticResource Tertiary}"
+                                    CornerRadius="6" Padding="12,6" FontSize="12"/>
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding AvailableProfiles}"
+                                        IsVisible="{Binding AvailableProfiles.Count, Converter={StaticResource IsNotZeroConverter}}"
+                                        MaximumHeightRequest="160">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:ImportProfile">
+                                    <Grid ColumnDefinitions="*,Auto" Padding="4,6">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                            <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold"/>
+                                            <Label Text="{Binding Summary}" FontSize="11"
+                                                   TextColor="{StaticResource Gray400}"/>
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1" Text="Load"
+                                                FontSize="12" CornerRadius="4" Padding="10,4"
+                                                BackgroundColor="{StaticResource Tertiary}"
+                                                TextColor="White"
+                                                CommandParameter="{Binding .}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ImportExcelViewModel}}, Path=ApplyProfileCommand}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <Label Text="No saved profiles yet. Configure the sheets below and click Save Profile."
+                               FontSize="11" TextColor="{StaticResource Gray400}" FontAttributes="Italic"
+                               IsVisible="{Binding AvailableProfiles.Count, Converter={StaticResource IsZeroConverter}}"/>
+                    </VerticalStackLayout>
+                </Border>
+
                 <!-- Sheet configuration -->
                 <VerticalStackLayout
                     IsVisible="{Binding SheetConfigs.Count, Converter={StaticResource IsNotZeroConverter}}"

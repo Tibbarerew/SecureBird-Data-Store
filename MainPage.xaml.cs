@@ -23,4 +23,9 @@ public partial class MainPage : ContentPage
     {
         await Shell.Current.GoToAsync(nameof(HierarchyPage));
     }
+
+    private async void OnProfilesClicked(object? sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync(nameof(ImportProfilesPage));
+    }
 }

@@ -28,6 +28,22 @@ public partial class DataStructuresViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<FieldDefinition> _editFields = [];
 
+    // Default parent rule (Option 3)
+    [ObservableProperty]
+    private bool _hasDefaultParent;
+
+    [ObservableProperty]
+    private DataStructure? _defaultParentStructure;
+
+    [ObservableProperty]
+    private ObservableCollection<DataRecord> _defaultParentRecords = [];
+
+    [ObservableProperty]
+    private DataRecord? _defaultParentRecord;
+
+    [ObservableProperty]
+    private string _defaultParentLabel = string.Empty;
+
     public DataStructuresViewModel(IJsonDataService dataService)
     {
         _dataService = dataService;
@@ -50,11 +66,15 @@ public partial class DataStructuresViewModel : BaseViewModel
         EditName = string.Empty;
         EditDescription = string.Empty;
         EditFields = [];
+        HasDefaultParent = false;
+        DefaultParentStructure = null;
+        DefaultParentRecord = null;
+        DefaultParentRecords = [];
         IsEditing = true;
     }
 
     [RelayCommand]
-    public void EditStructure(DataStructure structure)
+    public async Task EditStructureAsync(DataStructure structure)
     {
         SelectedStructure = structure;
         EditName = structure.Name;
@@ -62,13 +82,55 @@ public partial class DataStructuresViewModel : BaseViewModel
         EditFields = new ObservableCollection<FieldDefinition>(
             structure.Fields.Select(f => new FieldDefinition
             {
-                Name = f.Name,
-                Type = f.Type,
-                Required = f.Required,
-                DefaultValue = f.DefaultValue,
-                Description = f.Description
+                Name = f.Name, Type = f.Type, Required = f.Required,
+                DefaultValue = f.DefaultValue, Description = f.Description
             }));
+
+        // Load default parent rule
+        HasDefaultParent = structure.DefaultParentRecordId is not null;
+        DefaultParentStructure = null;
+        DefaultParentRecord = null;
+        DefaultParentRecords = [];
+
+        if (structure.ParentStructureId is not null && structure.DefaultParentRecordId is not null)
+        {
+            var parentStructure = Structures.FirstOrDefault(s => s.Id == structure.ParentStructureId);
+            if (parentStructure is not null)
+            {
+                DefaultParentStructure = parentStructure;
+                var records = await _dataService.GetRecordsAsync(parentStructure.Id);
+                DefaultParentRecords = new ObservableCollection<DataRecord>(records);
+                DefaultParentRecord = records.FirstOrDefault(r => r.Id == structure.DefaultParentRecordId);
+                UpdateDefaultParentLabel();
+            }
+        }
+
         IsEditing = true;
+    }
+
+    partial void OnDefaultParentStructureChanged(DataStructure? value)
+    {
+        DefaultParentRecord = null;
+        DefaultParentRecords = [];
+        DefaultParentLabel = string.Empty;
+        if (value is not null)
+            _ = LoadDefaultParentRecordsAsync(value);
+    }
+
+    partial void OnDefaultParentRecordChanged(DataRecord? value)
+        => UpdateDefaultParentLabel();
+
+    private async Task LoadDefaultParentRecordsAsync(DataStructure structure)
+    {
+        var records = await _dataService.GetRecordsAsync(structure.Id);
+        DefaultParentRecords = new ObservableCollection<DataRecord>(records);
+    }
+
+    private void UpdateDefaultParentLabel()
+    {
+        if (DefaultParentRecord is null) { DefaultParentLabel = string.Empty; return; }
+        var first = DefaultParentRecord.Fields.FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.Value));
+        DefaultParentLabel = first.Value ?? $"#{DefaultParentRecord.Id[..6]}";
     }
 
     [RelayCommand]
@@ -86,6 +148,17 @@ public partial class DataStructuresViewModel : BaseViewModel
             structure.Name = EditName.Trim();
             structure.Description = string.IsNullOrWhiteSpace(EditDescription) ? null : EditDescription.Trim();
             structure.Fields = [.. EditFields];
+
+            if (HasDefaultParent && DefaultParentRecord is not null && DefaultParentStructure is not null)
+            {
+                structure.ParentStructureId = DefaultParentStructure.Id;
+                structure.DefaultParentRecordId = DefaultParentRecord.Id;
+            }
+            else
+            {
+                structure.ParentStructureId = null;
+                structure.DefaultParentRecordId = null;
+            }
 
             await _dataService.SaveStructureAsync(structure);
             IsEditing = false;
@@ -112,15 +185,11 @@ public partial class DataStructuresViewModel : BaseViewModel
 
     [RelayCommand]
     public void AddField()
-    {
-        EditFields.Add(new FieldDefinition { Name = $"Field{EditFields.Count + 1}" });
-    }
+        => EditFields.Add(new FieldDefinition { Name = $"Field{EditFields.Count + 1}" });
 
     [RelayCommand]
     public void RemoveField(FieldDefinition field)
-    {
-        EditFields.Remove(field);
-    }
+        => EditFields.Remove(field);
 
     public IEnumerable<FieldType> FieldTypes => Enum.GetValues<FieldType>();
 }

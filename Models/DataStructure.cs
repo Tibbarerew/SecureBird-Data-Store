@@ -8,5 +8,6 @@ public class DataStructure
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public string? ParentStructureId { get; set; }
+    public string? DefaultParentRecordId { get; set; }
     public List<FieldDefinition> Fields { get; set; } = [];
 }

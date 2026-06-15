@@ -11,5 +11,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute(nameof(DataRecordsPage), typeof(DataRecordsPage));
         Routing.RegisterRoute(nameof(ImportExcelPage), typeof(ImportExcelPage));
         Routing.RegisterRoute(nameof(HierarchyPage), typeof(HierarchyPage));
+        Routing.RegisterRoute(nameof(ImportProfilesPage), typeof(ImportProfilesPage));
     }
 }

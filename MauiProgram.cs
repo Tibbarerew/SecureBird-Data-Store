@@ -21,12 +21,14 @@ public static class MauiProgram
         // Services
         builder.Services.AddSingleton<IJsonDataService, JsonDataService>();
         builder.Services.AddSingleton<IExcelImportService, ExcelImportService>();
+        builder.Services.AddSingleton<IProfileService, ProfileService>();
 
         // ViewModels
         builder.Services.AddTransient<DataStructuresViewModel>();
         builder.Services.AddTransient<DataRecordsViewModel>();
         builder.Services.AddTransient<ImportExcelViewModel>();
         builder.Services.AddTransient<HierarchyViewModel>();
+        builder.Services.AddTransient<ImportProfilesViewModel>();
 
         // Pages
         builder.Services.AddTransient<MainPage>();
@@ -34,6 +36,7 @@ public static class MauiProgram
         builder.Services.AddTransient<DataRecordsPage>();
         builder.Services.AddTransient<ImportExcelPage>();
         builder.Services.AddTransient<HierarchyPage>();
+        builder.Services.AddTransient<ImportProfilesPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();
