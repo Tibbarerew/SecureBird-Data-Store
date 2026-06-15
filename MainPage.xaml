@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SecureBird_Data_Store.MainPage"
+             Title="SecureBird Data Store">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header Banner -->
+        <Grid Grid.Row="0" Padding="24,32,24,24" BackgroundColor="{StaticResource Primary}">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="SecureBird" FontSize="28" FontAttributes="Bold" TextColor="White"/>
+                <Label Text="Data Store" FontSize="22" TextColor="{StaticResource Secondary}"/>
+                <Label Text="Manage structured data with JSON storage" FontSize="13"
+                       TextColor="White" Opacity="0.8" Margin="0,8,0,0"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Navigation Cards -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+
+                <Label Text="What would you like to do?" FontSize="16" FontAttributes="Bold"
+                       Margin="0,8,0,4"/>
+
+                <!-- Data Structures Card -->
+                <Border Padding="20" StrokeShape="RoundRectangle 10" Stroke="{StaticResource Gray200}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <BoxView Grid.Column="0" WidthRequest="4" HeightRequest="60"
+                                 Color="{StaticResource Primary}" CornerRadius="2" Margin="0,0,14,0"/>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Data Structures" FontSize="17" FontAttributes="Bold"/>
+                            <Label Text="Define schemas — the shape of your data. Fields, types, and constraints."
+                                   FontSize="13" TextColor="{StaticResource Gray500}"/>
+                            <Button Text="Manage Structures" Margin="0,10,0,0"
+                                    BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                    CornerRadius="6" Padding="14,6" HorizontalOptions="Start"
+                                    Clicked="OnManageStructuresClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Import Excel Card -->
+                <Border Padding="20" StrokeShape="RoundRectangle 10" Stroke="{StaticResource Gray200}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <BoxView Grid.Column="0" WidthRequest="4" HeightRequest="60"
+                                 Color="#217346" CornerRadius="2" Margin="0,0,14,0"/>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Import from Excel" FontSize="17" FontAttributes="Bold"/>
+                            <Label Text="Load an .xlsx file and let SecureBird detect column structure automatically."
+                                   FontSize="13" TextColor="{StaticResource Gray500}"/>
+                            <Button Text="Import Excel" Margin="0,10,0,0"
+                                    BackgroundColor="#217346" TextColor="White"
+                                    CornerRadius="6" Padding="14,6" HorizontalOptions="Start"
+                                    Clicked="OnImportExcelClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <!-- Info section -->
+                <Border Margin="0,8,0,0" Padding="16" StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{StaticResource Secondary}" Stroke="Transparent">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="How it works" FontSize="14" FontAttributes="Bold"/>
+                        <Label FontSize="13" TextColor="{StaticResource Gray600}">
+                            <Label.Text>1. Create a Data Structure to define your schema (or import from Excel).
+2. Add records to any structure — each record is saved as a JSON file.
+3. Import an Excel spreadsheet to automatically create a structure and populate records.</Label.Text>
+                        </Label>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

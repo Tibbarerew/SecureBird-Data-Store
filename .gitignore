@@ -1,0 +1,41 @@
+## .NET / MAUI
+bin/
+obj/
+*.user
+.vs/
+.vscode/
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build artifacts
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+## NuGet
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## IDE
+.idea/
+*.swp
+*~

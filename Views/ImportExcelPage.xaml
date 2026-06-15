@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SecureBird_Data_Store.ViewModels"
+             xmlns:models="clr-namespace:SecureBird_Data_Store.Models"
+             x:Class="SecureBird_Data_Store.Views.ImportExcelPage"
+             x:DataType="vm:ImportExcelViewModel"
+             Title="Import Excel">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" Padding="16,12"
+                               BackgroundColor="#217346">
+            <Label Text="Import from Excel" FontSize="20" FontAttributes="Bold"
+                   TextColor="White" VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="16">
+
+                <!-- Step 1: File Selection -->
+                <Border Padding="16" StrokeShape="RoundRectangle 8" Stroke="{StaticResource Gray200}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Step 1 — Select Excel File" FontSize="15" FontAttributes="Bold"/>
+                        <Button Text="Browse for Excel File..." Command="{Binding PickFileCommand}"
+                                BackgroundColor="#217346" TextColor="White" CornerRadius="6"
+                                HorizontalOptions="Start" Padding="14,8"/>
+                        <Label Text="{Binding FilePath}" FontSize="12" TextColor="{StaticResource Gray500}"
+                               IsVisible="{Binding FilePath, Converter={StaticResource IsNotNullOrEmptyConverter}}"
+                               LineBreakMode="TailTruncation"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Step 2: Sheet Selection -->
+                <Border Padding="16" StrokeShape="RoundRectangle 8" Stroke="{StaticResource Gray200}"
+                        IsVisible="{Binding ImportResult.Success}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Step 2 — Select Sheet" FontSize="15" FontAttributes="Bold"/>
+                        <Picker ItemsSource="{Binding ImportResult.Sheets}"
+                                SelectedItem="{Binding SelectedSheet}"
+                                ItemDisplayBinding="{Binding SheetName}"
+                                Title="Choose a sheet"/>
+
+                        <!-- Sheet Preview -->
+                        <VerticalStackLayout IsVisible="{Binding SelectedSheet, Converter={StaticResource IsNotNullConverter}}"
+                                             Spacing="8">
+                            <Label Text="{Binding SelectedSheet.Headers.Count, StringFormat='{0} columns detected'}"
+                                   FontSize="13" TextColor="{StaticResource Gray500}"/>
+                            <Label Text="{Binding SelectedSheet.TotalRows, StringFormat='{0} data rows'}"
+                                   FontSize="13" TextColor="{StaticResource Gray500}"/>
+
+                            <Label Text="Detected columns:" FontSize="13" FontAttributes="Bold" Margin="0,4,0,0"/>
+                            <CollectionView ItemsSource="{Binding SelectedSheet.Headers}" MaximumHeightRequest="120">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Label Text="{Binding .}" Margin="8,2" FontSize="13"
+                                               TextColor="{StaticResource Gray600}"/>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Step 3: Target Structure -->
+                <Border Padding="16" StrokeShape="RoundRectangle 8" Stroke="{StaticResource Gray200}"
+                        IsVisible="{Binding SelectedSheet, Converter={StaticResource IsNotNullConverter}}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Step 3 — Target Data Structure" FontSize="15" FontAttributes="Bold"/>
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" RowSpacing="8">
+                            <RadioButton Grid.Row="0" Grid.Column="0" IsChecked="{Binding CreateNewStructure}"
+                                         GroupName="StructureMode"/>
+                            <Label Grid.Row="0" Grid.Column="1" Text="Create new structure from Excel headers"
+                                   VerticalOptions="Center" FontSize="14"/>
+
+                            <RadioButton Grid.Row="1" Grid.Column="0"
+                                         IsChecked="{Binding CreateNewStructure, Converter={StaticResource InvertedBoolConverter}}"
+                                         GroupName="StructureMode"/>
+                            <Label Grid.Row="1" Grid.Column="1" Text="Map to existing structure"
+                                   VerticalOptions="Center" FontSize="14"/>
+                        </Grid>
+
+                        <!-- New structure name -->
+                        <VerticalStackLayout IsVisible="{Binding CreateNewStructure}" Spacing="4">
+                            <Label Text="Structure name:" FontSize="13"/>
+                            <Entry Text="{Binding NewStructureName}" Placeholder="Enter a name"/>
+                        </VerticalStackLayout>
+
+                        <!-- Existing structure picker -->
+                        <Picker IsVisible="{Binding CreateNewStructure, Converter={StaticResource InvertedBoolConverter}}"
+                                ItemsSource="{Binding ExistingStructures}"
+                                SelectedItem="{Binding TargetStructure}"
+                                ItemDisplayBinding="{Binding Name}"
+                                Title="Select existing structure"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Success Message -->
+                <Border Padding="16" StrokeShape="RoundRectangle 8" Stroke="#217346"
+                        BackgroundColor="#F0FFF4"
+                        IsVisible="{Binding ImportComplete}">
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label Text="Import Complete!" FontSize="18" FontAttributes="Bold"
+                               TextColor="#217346" HorizontalOptions="Center"/>
+                        <Label Text="{Binding ImportedCount, StringFormat='{0} records imported successfully.'}"
+                               FontSize="14" HorizontalOptions="Center"/>
+                        <Button Text="Import Another File" Command="{Binding ResetCommand}"
+                                BackgroundColor="#217346" TextColor="White"
+                                CornerRadius="6" HorizontalOptions="Center" Padding="14,8" Margin="0,8,0,0"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom Action Bar -->
+        <Grid Grid.Row="2" Padding="16,10" BackgroundColor="{StaticResource Gray100}"
+              ColumnDefinitions="*,Auto"
+              IsVisible="{Binding ImportComplete, Converter={StaticResource InvertedBoolConverter}}">
+            <Label Grid.Column="0" Text="{Binding StatusMessage}" TextColor="{StaticResource Gray600}"
+                   VerticalOptions="Center" FontSize="13"/>
+            <Button Grid.Column="1" Text="Import Data" Command="{Binding ImportCommand}"
+                    BackgroundColor="#217346" TextColor="White"
+                    CornerRadius="6" Padding="16,8"
+                    IsEnabled="{Binding IsNotBusy}"
+                    IsVisible="{Binding SelectedSheet, Converter={StaticResource IsNotNullConverter}}"/>
+        </Grid>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SecureBird_Data_Store.ViewModels"
+             xmlns:models="clr-namespace:SecureBird_Data_Store.Models"
+             x:Class="SecureBird_Data_Store.Views.DataRecordsPage"
+             x:DataType="vm:DataRecordsViewModel"
+             Title="Records">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Toolbar -->
+        <HorizontalStackLayout Grid.Row="0" Padding="16,12" Spacing="8"
+                               BackgroundColor="{StaticResource Tertiary}">
+            <Label Text="{Binding CurrentStructure.Name, StringFormat='Records: {0}'}"
+                   FontSize="18" FontAttributes="Bold" TextColor="White"
+                   VerticalOptions="Center" HorizontalOptions="StartAndExpand"/>
+            <Button Text="+ New Record" Command="{Binding NewRecordCommand}"
+                    BackgroundColor="White" TextColor="{StaticResource Tertiary}"
+                    CornerRadius="6" Padding="12,6"/>
+        </HorizontalStackLayout>
+
+        <!-- Content -->
+        <Grid Grid.Row="1">
+
+            <!-- Record List -->
+            <CollectionView ItemsSource="{Binding Records}"
+                            IsVisible="{Binding IsEditing, Converter={StaticResource InvertedBoolConverter}}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="12">
+                        <Label Text="No records yet." FontSize="16" TextColor="{StaticResource Gray500}"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Create a new record or import from Excel." FontSize="13"
+                               TextColor="{StaticResource Gray400}" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:DataRecord">
+                        <Border Margin="12,6" Padding="14" StrokeShape="RoundRectangle 8"
+                                Stroke="{StaticResource Gray200}">
+                            <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto">
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Id}"
+                                       FontSize="14" FontAttributes="Bold"/>
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding CreatedAt, StringFormat='Created {0:g}'}"
+                                       FontSize="11" TextColor="{StaticResource Gray400}"/>
+                                <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                        Text="Edit" FontSize="12"
+                                        BackgroundColor="{StaticResource Secondary}"
+                                        TextColor="{StaticResource Tertiary}"
+                                        CornerRadius="4" Padding="10,4" Margin="4,0"
+                                        CommandParameter="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataRecordsViewModel}}, Path=EditRecordCommand}"/>
+                                <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                        Text="Delete" FontSize="12"
+                                        BackgroundColor="#FFEEEE" TextColor="Red"
+                                        CornerRadius="4" Padding="10,4"
+                                        CommandParameter="{Binding .}"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataRecordsViewModel}}, Path=DeleteCommand}"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Record Editor -->
+            <ScrollView IsVisible="{Binding IsEditing}">
+                <VerticalStackLayout Padding="16" Spacing="10">
+                    <Label Text="{Binding SelectedRecord, Converter={StaticResource NullToStringConverter},
+                           ConverterParameter='New Record|Edit Record'}"
+                           FontSize="18" FontAttributes="Bold" Margin="0,0,0,8"/>
+
+                    <CollectionView ItemsSource="{Binding EditFields}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:FieldEntry">
+                                <VerticalStackLayout Margin="0,4" Spacing="2">
+                                    <Label Text="{Binding Key}" FontSize="13" FontAttributes="Bold"/>
+                                    <Entry Text="{Binding Value}" Placeholder="{Binding Key}"/>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Grid>
+
+        <!-- Status / Action Bar -->
+        <Grid Grid.Row="2" Padding="16,10" BackgroundColor="{StaticResource Gray100}" ColumnDefinitions="*,Auto,Auto">
+            <Label Grid.Column="0" Text="{Binding StatusMessage}" TextColor="{StaticResource Gray600}"
+                   VerticalOptions="Center" FontSize="13"/>
+            <Button Grid.Column="1" Text="Cancel" Command="{Binding CancelCommand}"
+                    IsVisible="{Binding IsEditing}"
+                    BackgroundColor="{StaticResource Gray200}" TextColor="{StaticResource Gray600}"
+                    CornerRadius="6" Padding="14,6" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" Text="Save Record" Command="{Binding SaveCommand}"
+                    IsVisible="{Binding IsEditing}"
+                    BackgroundColor="{StaticResource Tertiary}" TextColor="White"
+                    CornerRadius="6" Padding="14,6"/>
+        </Grid>
+    </Grid>
+</ContentPage>
