@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SecureBird_Data_Store.ViewModels"
+             xmlns:models="clr-namespace:SecureBird_Data_Store.Models"
+             x:Class="SecureBird_Data_Store.Views.ExportPage"
+             x:DataType="vm:ExportViewModel"
+             Title="Export Data">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="16,12" BackgroundColor="#16213e">
+            <Label Text="Export Data" FontSize="20" FontAttributes="Bold" TextColor="White"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="14">
+
+                <!-- Structure picker -->
+                <Label Text="Structure" FontSize="13" FontAttributes="Bold"/>
+                <Picker ItemsSource="{Binding Structures}"
+                        SelectedItem="{Binding SelectedStructure}"
+                        ItemDisplayBinding="{Binding Name}"
+                        Title="Choose a structure" FontSize="14"/>
+                <Label Text="{Binding RecordCount, StringFormat='{0} records available'}"
+                       FontSize="12" TextColor="{StaticResource Gray500}"
+                       IsVisible="{Binding SelectedStructure, Converter={StaticResource IsNotNullConverter}}"/>
+
+                <!-- Format picker -->
+                <Label Text="Format" FontSize="13" FontAttributes="Bold" Margin="0,8,0,0"/>
+                <Picker ItemsSource="{Binding FormatNames}"
+                        SelectedIndex="{Binding SelectedFormatIndex}"
+                        FontSize="13"/>
+
+                <!-- Field mapping for fine-tuning formats -->
+                <Border IsVisible="{Binding ShowFieldPickers}"
+                        Padding="14" StrokeShape="RoundRectangle 8"
+                        Stroke="{StaticResource Secondary}" BackgroundColor="#F8F6FF">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Field mapping" FontSize="13" FontAttributes="Bold"
+                               TextColor="{StaticResource Tertiary}"/>
+                        <Label Text="Map your structure fields to prompt and completion roles."
+                               FontSize="11" TextColor="{StaticResource Gray500}"/>
+                        <Label Text="Prompt field:" FontSize="12" TextColor="{StaticResource Gray600}"/>
+                        <Picker ItemsSource="{Binding AvailableFields}"
+                                SelectedItem="{Binding PromptField}"
+                                ItemDisplayBinding="{Binding Name}"
+                                Title="Pick prompt field" FontSize="13"/>
+                        <Label Text="Completion field:" FontSize="12" TextColor="{StaticResource Gray600}"/>
+                        <Picker ItemsSource="{Binding AvailableFields}"
+                                SelectedItem="{Binding CompletionField}"
+                                ItemDisplayBinding="{Binding Name}"
+                                Title="Pick completion field" FontSize="13"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Live preview -->
+                <Label Text="Preview (first 3 records)" FontSize="13" FontAttributes="Bold"
+                       Margin="0,8,0,0"
+                       IsVisible="{Binding SelectedStructure, Converter={StaticResource IsNotNullConverter}}"/>
+                <Border IsVisible="{Binding SelectedStructure, Converter={StaticResource IsNotNullConverter}}"
+                        Padding="12" StrokeShape="RoundRectangle 6"
+                        BackgroundColor="#1e1e1e" Stroke="Transparent">
+                    <Editor Text="{Binding Preview}" IsReadOnly="True"
+                            FontFamily="Courier New" FontSize="11"
+                            TextColor="#d4d4d4" BackgroundColor="Transparent"
+                            AutoSize="TextChanges" MinimumHeightRequest="100"/>
+                </Border>
+
+                <!-- Saved file path -->
+                <Label Text="{Binding ExportedPath, StringFormat='Saved to: {0}'}"
+                       FontSize="12" TextColor="{StaticResource Tertiary}" FontAttributes="Italic"
+                       IsVisible="{Binding ExportedPath, Converter={StaticResource IsNotNullOrEmptyConverter}}"
+                       LineBreakMode="MiddleTruncation"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Action bar -->
+        <Grid Grid.Row="2" Padding="16,10" BackgroundColor="{StaticResource Gray100}"
+              ColumnDefinitions="*,Auto,Auto">
+            <Label Grid.Column="0" Text="{Binding StatusMessage}" TextColor="{StaticResource Gray600}"
+                   VerticalOptions="Center" FontSize="13"/>
+            <Button Grid.Column="1" Text="Open Folder" Command="{Binding OpenExportFolderCommand}"
+                    IsVisible="{Binding ExportedPath, Converter={StaticResource IsNotNullOrEmptyConverter}}"
+                    BackgroundColor="{StaticResource Gray200}" TextColor="{StaticResource Gray600}"
+                    CornerRadius="6" Padding="14,6" Margin="0,0,8,0" FontSize="13"/>
+            <Button Grid.Column="2" Text="Export"
+                    Command="{Binding ExportCommand}"
+                    IsEnabled="{Binding SelectedStructure, Converter={StaticResource IsNotNullConverter}}"
+                    BackgroundColor="#16213e" TextColor="White"
+                    CornerRadius="6" Padding="14,6" FontSize="13"/>
+        </Grid>
+
+    </Grid>
+</ContentPage>

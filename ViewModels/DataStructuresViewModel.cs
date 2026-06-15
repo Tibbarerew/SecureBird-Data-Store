@@ -44,6 +44,13 @@ public partial class DataStructuresViewModel : BaseViewModel
     [ObservableProperty]
     private string _defaultParentLabel = string.Empty;
 
+    // Prompt/completion field mapping for export
+    [ObservableProperty]
+    private FieldDefinition? _editPromptField;
+
+    [ObservableProperty]
+    private FieldDefinition? _editCompletionField;
+
     public DataStructuresViewModel(IJsonDataService dataService)
     {
         _dataService = dataService;
@@ -70,6 +77,8 @@ public partial class DataStructuresViewModel : BaseViewModel
         DefaultParentStructure = null;
         DefaultParentRecord = null;
         DefaultParentRecords = [];
+        EditPromptField = null;
+        EditCompletionField = null;
         IsEditing = true;
     }
 
@@ -104,6 +113,13 @@ public partial class DataStructuresViewModel : BaseViewModel
                 UpdateDefaultParentLabel();
             }
         }
+
+        EditPromptField = structure.PromptFieldName is not null
+            ? EditFields.FirstOrDefault(f => f.Name == structure.PromptFieldName)
+            : null;
+        EditCompletionField = structure.CompletionFieldName is not null
+            ? EditFields.FirstOrDefault(f => f.Name == structure.CompletionFieldName)
+            : null;
 
         IsEditing = true;
     }
@@ -159,6 +175,9 @@ public partial class DataStructuresViewModel : BaseViewModel
                 structure.ParentStructureId = null;
                 structure.DefaultParentRecordId = null;
             }
+
+            structure.PromptFieldName = EditPromptField?.Name;
+            structure.CompletionFieldName = EditCompletionField?.Name;
 
             await _dataService.SaveStructureAsync(structure);
             IsEditing = false;

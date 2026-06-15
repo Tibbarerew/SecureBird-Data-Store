@@ -91,6 +91,23 @@
                     </Grid>
                 </Border>
 
+                <!-- Export Card -->
+                <Border Padding="20" StrokeShape="RoundRectangle 10" Stroke="{StaticResource Gray200}">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <BoxView Grid.Column="0" WidthRequest="4" HeightRequest="60"
+                                 Color="#16213e" CornerRadius="2" Margin="0,0,14,0"/>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="Export Data" FontSize="17" FontAttributes="Bold"/>
+                            <Label Text="Export records as JSONL, CSV, or fine-tuning prompt/completion pairs for AI training."
+                                   FontSize="13" TextColor="{StaticResource Gray500}"/>
+                            <Button Text="Export" Margin="0,10,0,0"
+                                    BackgroundColor="#16213e" TextColor="White"
+                                    CornerRadius="6" Padding="14,6" HorizontalOptions="Start"
+                                    Clicked="OnExportClicked"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
                 <!-- Info section -->
                 <Border Margin="0,8,0,0" Padding="16" StrokeShape="RoundRectangle 8"
                         BackgroundColor="{StaticResource Secondary}" Stroke="Transparent">

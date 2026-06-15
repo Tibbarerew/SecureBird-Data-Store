@@ -170,6 +170,28 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
+
+                    <!-- Export: Prompt / Completion mapping -->
+                    <Border IsVisible="{Binding EditFields.Count, Converter={StaticResource IsNotZeroConverter}}"
+                            Padding="14" StrokeShape="RoundRectangle 8"
+                            Stroke="#aaaacc" BackgroundColor="#f0f0ff" Margin="0,4,0,0">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Export — Prompt / Completion Mapping" FontSize="13"
+                                   FontAttributes="Bold" TextColor="#16213e"/>
+                            <Label Text="Designate which fields are the prompt and completion when exporting for fine-tuning. Optional — you can also set this at export time."
+                                   FontSize="11" TextColor="{StaticResource Gray500}"/>
+                            <Label Text="Prompt field:" FontSize="12"/>
+                            <Picker ItemsSource="{Binding EditFields}"
+                                    SelectedItem="{Binding EditPromptField}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    Title="None" FontSize="13"/>
+                            <Label Text="Completion field:" FontSize="12"/>
+                            <Picker ItemsSource="{Binding EditFields}"
+                                    SelectedItem="{Binding EditCompletionField}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    Title="None" FontSize="13"/>
+                        </VerticalStackLayout>
+                    </Border>
                 </VerticalStackLayout>
             </ScrollView>
         </Grid>
