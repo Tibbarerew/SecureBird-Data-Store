@@ -36,7 +36,7 @@
                         <DataTemplate x:DataType="models:DataStructure">
                             <Border Margin="12,6" Padding="16" StrokeShape="RoundRectangle 8"
                                     Stroke="{StaticResource Gray200}">
-                                <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto">
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto">
                                     <Label Grid.Row="0" Grid.Column="0" Text="{Binding Name}"
                                            FontSize="15" FontAttributes="Bold"/>
                                     <Label Grid.Row="1" Grid.Column="0" Text="{Binding Description}"
@@ -56,13 +56,20 @@
                                            FontSize="11" TextColor="{StaticResource Gray400}"
                                            HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,8,0"/>
                                     <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                            Text="Records" FontSize="12"
+                                            BackgroundColor="{StaticResource Primary}"
+                                            TextColor="White"
+                                            CornerRadius="4" Padding="10,4" Margin="4,0"
+                                            CommandParameter="{Binding .}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataStructuresViewModel}}, Path=ViewRecordsAsyncCommand}"/>
+                                    <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                             Text="Edit" FontSize="12"
                                             BackgroundColor="{StaticResource Secondary}"
                                             TextColor="{StaticResource Tertiary}"
                                             CornerRadius="4" Padding="10,4" Margin="4,0"
                                             CommandParameter="{Binding .}"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataStructuresViewModel}}, Path=EditStructureAsyncCommand}"/>
-                                    <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                    <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                                             Text="Delete" FontSize="12"
                                             BackgroundColor="#FFEEEE" TextColor="Red"
                                             CornerRadius="4" Padding="10,4" Margin="4,0"

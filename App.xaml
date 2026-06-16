@@ -18,6 +18,7 @@
             <converters:IsNotZeroConverter x:Key="IsNotZeroConverter"/>
             <converters:IsZeroConverter x:Key="IsZeroConverter"/>
             <converters:IsNullConverter x:Key="IsNullConverter"/>
+            <converters:RecordSummaryConverter x:Key="RecordSummaryConverter"/>
             <converters:RecordDisplayConverter x:Key="RecordDisplayConverter"/>
         </ResourceDictionary>
     </Application.Resources>

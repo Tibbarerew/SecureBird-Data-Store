@@ -203,6 +203,13 @@ public partial class DataStructuresViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    public async Task ViewRecordsAsync(DataStructure structure)
+    {
+        await Shell.Current.GoToAsync(nameof(Views.DataRecordsPage),
+            new ShellNavigationQueryParameters { { "Structure", structure } });
+    }
+
+    [RelayCommand]
     public void AddField()
         => EditFields.Add(new FieldDefinition { Name = $"Field{EditFields.Count + 1}" });
 

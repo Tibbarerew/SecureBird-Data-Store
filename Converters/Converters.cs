@@ -72,6 +72,23 @@ public class IsNullConverter : IValueConverter
         => throw new NotImplementedException();
 }
 
+// Shows a brief "field1: val  ·  field2: val" summary for a DataRecord list item
+public class RecordSummaryConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not DataRecord record) return string.Empty;
+        var parts = record.Fields
+            .Where(f => !string.IsNullOrWhiteSpace(f.Value))
+            .Take(3)
+            .Select(f => $"{f.Key}: {f.Value}");
+        return string.Join("  ·  ", parts);
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
 // Shows the first non-empty field value of a DataRecord in a Picker
 public class RecordDisplayConverter : IValueConverter
 {
