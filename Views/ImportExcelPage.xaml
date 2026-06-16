@@ -169,12 +169,9 @@
                                                     IsVisible="{Binding AvailableParentRecords.Count, Converter={StaticResource IsNotZeroConverter}}"
                                                     ItemsSource="{Binding AvailableParentRecords}"
                                                     SelectedItem="{Binding SelectedParentRecord}"
+                                                    ItemDisplayBinding="{Binding DisplayName}"
                                                     Title="Pick parent record"
-                                                    FontSize="13">
-                                                    <Picker.ItemDisplayBinding>
-                                                        <Binding Path="." Converter="{StaticResource RecordDisplayConverter}"/>
-                                                    </Picker.ItemDisplayBinding>
-                                                </Picker>
+                                                    FontSize="13"/>
 
                                                 <Label IsVisible="{Binding SelectedParentRecord, Converter={StaticResource IsNotNullConverter}}"
                                                        Text="{Binding ParentRecordLabel, StringFormat='Parent: {0}'}"

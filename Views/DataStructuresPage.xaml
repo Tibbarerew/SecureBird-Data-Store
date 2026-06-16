@@ -61,14 +61,14 @@
                                             TextColor="White"
                                             CornerRadius="4" Padding="10,4" Margin="4,0"
                                             CommandParameter="{Binding .}"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataStructuresViewModel}}, Path=ViewRecordsAsyncCommand}"/>
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataStructuresViewModel}}, Path=ViewRecordsCommand}"/>
                                     <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                             Text="Edit" FontSize="12"
                                             BackgroundColor="{StaticResource Secondary}"
                                             TextColor="{StaticResource Tertiary}"
                                             CornerRadius="4" Padding="10,4" Margin="4,0"
                                             CommandParameter="{Binding .}"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataStructuresViewModel}}, Path=EditStructureAsyncCommand}"/>
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DataStructuresViewModel}}, Path=EditStructureCommand}"/>
                                     <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                                             Text="Delete" FontSize="12"
                                             BackgroundColor="#FFEEEE" TextColor="Red"
@@ -125,13 +125,10 @@
                                        IsVisible="{Binding DefaultParentRecords.Count, Converter={StaticResource IsNotZeroConverter}}"/>
                                 <Picker ItemsSource="{Binding DefaultParentRecords}"
                                         SelectedItem="{Binding DefaultParentRecord}"
+                                        ItemDisplayBinding="{Binding DisplayName}"
                                         Title="Pick the default parent record"
                                         FontSize="13"
-                                        IsVisible="{Binding DefaultParentRecords.Count, Converter={StaticResource IsNotZeroConverter}}">
-                                    <Picker.ItemDisplayBinding>
-                                        <Binding Path="." Converter="{StaticResource RecordDisplayConverter}"/>
-                                    </Picker.ItemDisplayBinding>
-                                </Picker>
+                                        IsVisible="{Binding DefaultParentRecords.Count, Converter={StaticResource IsNotZeroConverter}}"/>
 
                                 <Label IsVisible="{Binding DefaultParentRecord, Converter={StaticResource IsNotNullConverter}}"
                                        Text="{Binding DefaultParentLabel, StringFormat='Rule: all new records get this parent: {0}'}"

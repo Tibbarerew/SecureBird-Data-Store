@@ -8,4 +8,8 @@ public class DataRecord
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public string? ParentRecordId { get; set; }
     public Dictionary<string, string?> Fields { get; set; } = [];
+
+    public string DisplayName =>
+        Fields.FirstOrDefault(f => !string.IsNullOrWhiteSpace(f.Value)).Value
+        ?? $"#{Id[..6]}";
 }
