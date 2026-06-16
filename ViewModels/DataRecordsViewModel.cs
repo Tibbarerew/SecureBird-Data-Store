@@ -104,6 +104,14 @@ public partial class DataRecordsViewModel : BaseViewModel
     public async Task DeleteAsync(DataRecord record)
     {
         if (CurrentStructure is null) return;
+
+        var confirmed = await Shell.Current.DisplayAlert(
+            "Delete Record",
+            $"Delete \"{record.DisplayName}\"? This cannot be undone.",
+            "Delete", "Cancel");
+
+        if (!confirmed) return;
+
         await RunAsync(async () =>
         {
             await _dataService.DeleteRecordAsync(CurrentStructure.Id, record.Id);

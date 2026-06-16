@@ -195,6 +195,13 @@ public partial class DataStructuresViewModel : BaseViewModel
     [RelayCommand]
     public async Task DeleteAsync(DataStructure structure)
     {
+        var confirmed = await Shell.Current.DisplayAlert(
+            "Delete Structure",
+            $"Delete \"{structure.Name}\" and all its records? This cannot be undone.",
+            "Delete", "Cancel");
+
+        if (!confirmed) return;
+
         await RunAsync(async () =>
         {
             await _dataService.DeleteStructureAsync(structure.Id);
